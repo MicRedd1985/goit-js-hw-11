@@ -2,7 +2,7 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import axios from 'axios';
-
+import makeURL from './pixabay';
 
 const lightbox = new SimpleLightbox('.gallery a', {
   docClose: true,
@@ -29,7 +29,7 @@ searchForm.addEventListener('submit', event => {
   fetchByName(searchValue, 1);
 });
 
-window.addEventListener('load', hideButton);
+
 
 gallery.addEventListener('click', event => event.preventDefault());
 
@@ -47,10 +47,8 @@ async function fetchByName(name, page) {
   }
 }
 
-const apiKey = '31315940-fbb1061bb3bfe12c6324aab94';
-function makeURL(name, page){
-    return `https://pixabay.com/api/?key=${apiKey}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${page}`;
-}
+
+
 
 function renderResult(result) {
   if (result.hits.length == 0) {
@@ -59,13 +57,15 @@ function renderResult(result) {
   }
   if (page == 1) {
     Notiflix.Notify.success(`Hooray! We found ${result.totalHits} images.`);
+    button.classList.remove('is-hidden');
   }
   totalShowed += result.hits.length;
   if (totalShowed >= result.totalHits) {
     Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`);
+    button.classList.add('is-hidden');
   }
   gallery.innerHTML += result.hits.map(createResult).join('');
-  totalShowed >= result.totalHits ? hideButton() : showButton();
+  
 
   const { height: cardHeight } = document
     .querySelector('.gallery')
@@ -102,14 +102,4 @@ function createResult({
 
 function renderError(result) {
   Notiflix.Notify.failure('Something goes wrong! ' + result.message);
-}
-
-function hideButton(){
-  button.style.display = 'none';
-  button.style.visibility = 'hidden';
-}
-
-function showButton(){
-  button.style.display = 'block';
-  button.style.visibility = 'visible';
 }
